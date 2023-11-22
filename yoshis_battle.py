@@ -1,32 +1,77 @@
+from PIL import Image, ImageTk
 import tkinter as tk
+import random
 
-class EstadoJuego:
-    #5 CPU
-    #6 User
+free_space = [
+    (0, 2), (0, 3), (0, 4), (0, 5),
+    (1, 1), (1, 2), (1, 3), (1, 4), (1,5), (1,6),
+    (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2,7),
+    (3, 0), (3, 1), (3, 2), (3, 5), (3, 6), (3,7),
+    (4, 0), (4, 1), (4, 2), (4, 5), (4, 6), (4,7),
+    (5, 0), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (5, 6), (5,7),
+    (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6),
+    (7, 2), (7, 3), (7, 4), (7, 5)
+]
+
+class GameState:
+    #4 CPU
+    #2 User
     def __init__(self, matriz):
         self.matriz = matriz
 
 
-def leer_juego():
-    with open('games/game.txt', 'r') as juego:
-        lineas = juego.readlines()
-    matriz = [list(map(int, linea.split())) for linea in lineas]
-    return EstadoJuego(matriz)
+def read_game():
+    with open('initGame.txt', 'r') as juego:
+        lines = juego.readlines()
+    matriz = [list(map(int, line.split())) for line in lines]
+    #Put cpu in random place without coins
+    cpu_place = random.choice(free_space)
+    matriz[cpu_place[0]][cpu_place[1]] = 4
+    free_space.remove(cpu_place) # Don't use same place for user
+    #Put user in random place without coins
+    user_place = random.choice(free_space)
+    matriz[user_place[0]][user_place[1]] = 2
+    return GameState(matriz)
 
-def jugar(tablero):
-    print(tablero.matriz)
+def load_images():
+    img_dict = {
+        0 : ImageTk.PhotoImage(file="media/none.png"),
+        1 : ImageTk.PhotoImage(file="media/coin.png"),
+        2 : ImageTk.PhotoImage(file="media/user.png"),
+        3 : ImageTk.PhotoImage(file="media/supercoin.png"),
+        4 : ImageTk.PhotoImage(file="media/cpu.png"),
+    }
+    return img_dict
 
-def actualizar_interfaz(tablero):
+def play(board):
+    return 1
+
+def board_interface(board, frame):
+    img_dict = load_images()
     for i in range(8):
         for j in range(8):
-            label = tk.Label(root, text=str(tablero.matriz[i][j]), borderwidth=1, relief="solid", width=5, height=2)
+            numero = board.matriz[i][j]
+            imagen = img_dict[numero]
+            label = tk.Label(frame, image=imagen, borderwidth=1, relief="solid",)
+            label.img = img_dict[numero]
             label.grid(row=i, column=j)
 
 if __name__ == "__main__":
-    tablero = leer_juego()
+    #InitGame
+    board = read_game()
+
+    #Root interface
     root = tk.Tk()
     root.title ("Yoshi's battle")
-    jugar(tablero)
-    actualizar_interfaz(tablero)
+    root.configure(background="red")
+
+    #Frame Grid
+    frame_board = tk.Frame(root)
+    frame_board.pack()
+
+    #Jugar
+    board_interface(board, frame_board)
+    play(board)
+
     root.mainloop()
 
