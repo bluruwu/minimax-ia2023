@@ -1,5 +1,6 @@
 from PIL import Image, ImageTk
 import tkinter as tk
+import tkinter.font as tkFont
 import random
 
 free_space = [
@@ -24,11 +25,11 @@ def read_game():
     with open('initGame.txt', 'r') as juego:
         lines = juego.readlines()
     matriz = [list(map(int, line.split())) for line in lines]
-    #Put cpu in random place without coins
+    #Place cpu in random place without coins
     cpu_place = random.choice(free_space)
     matriz[cpu_place[0]][cpu_place[1]] = 4
     free_space.remove(cpu_place) # Don't use same place for user
-    #Put user in random place without coins
+    #Place user in random place without coins
     user_place = random.choice(free_space)
     matriz[user_place[0]][user_place[1]] = 2
     return GameState(matriz)
@@ -56,6 +57,12 @@ def board_interface(board, frame):
             label.img = img_dict[numero]
             label.grid(row=i, column=j)
 
+def points(frame):
+    font_size = tkFont.Font(size=16)
+    tk.Label(frame, text="Puntuación", font=font_size, anchor="w", background="blue", justify="center").pack(fill="both")
+    tk.Label(frame, text="aaaaa", font=font_size, anchor="w", background="red", justify="left").pack(fill="both")
+
+
 if __name__ == "__main__":
     #InitGame
     board = read_game()
@@ -63,14 +70,18 @@ if __name__ == "__main__":
     #Root interface
     root = tk.Tk()
     root.title ("Yoshi's battle")
-    root.configure(background="red")
-
+    root.resizable(False,False)
+    root.iconbitmap("media/user.ico")
     #Frame Grid
     frame_board = tk.Frame(root)
     frame_board.pack()
 
-    #Jugar
+    #Points
+    frame_points = tk.Frame(root)
+    frame_points.pack(side="bottom", fill="both")
+    #Play
     board_interface(board, frame_board)
+    points(frame_points)
     play(board)
 
     root.mainloop()
