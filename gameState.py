@@ -52,7 +52,7 @@ class GameState:
 
     def showPlayerMovements(self):
         ##Posibles movimientos en L
-        patterns=[[-2,-1],[-2,1],[2,1],[2,-1]]
+        patterns=[[-1,-2],[-2,-1],[-2,1],[-1,2],[1,2],[2,1],[2,-1],[1,-2]]
         movements=[]
         position=self.player.getPosition()
         for n in patterns:
@@ -61,12 +61,8 @@ class GameState:
                 movements.append(newPosition)
         return movements
     
-
-
-
-    ##Not sure if the methods below will be necessary
     def _showIAMovements(self):
-        patterns=[[-2,-1],[-2,1],[2,1],[2,-1]]
+        patterns=[[-1,-2],[-2,-1],[-2,1],[-1,2],[1,2],[2,1],[2,-1],[1,-2]]
         movements=[]
         position=self.player.getPosition()
         for n in patterns:
