@@ -1,7 +1,8 @@
-from yoshis_battle import GameState
+from gameState import GameState
+from player import Player
 import copy
 class Node:
-    def __init__(self,game : GameState,father,pos) -> None:
+    def __init__(self,game : GameState,father ,pos) -> None:
         self.path=[]
         self.father=father
         self.gameState=game
