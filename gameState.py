@@ -9,7 +9,9 @@ class GameState:
         self.player=Player(playerPosition)
         self.ia=Player(iaPosition)
         self.matriz = matriz
+        self.blocked_movements = []
         self.whoWon='NotYet'
+        self.tookcoin = False
         self
 
     def calculateWhoWon(self):
@@ -26,23 +28,23 @@ class GameState:
     def movePlayer(self,newPosition):
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
            self.player.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
-           self.coinsleft-=self.matriz[newPosition[0]][newPosition[1]]
+           self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
            if(self.coinPointsLeft==0):
                self.whoWon=self.calculateWhoWon()
-
-
         oldPosition=self.player.getPosition()
         self.matriz[oldPosition[0]][oldPosition[1]]=0
         self.player.movePlayer(newPosition)
         self.matriz[newPosition[0]][newPosition[1]]=2
-        self._moveIAPlayer()
+        #Lo borre porque me actualiza la posicion de la ia a pesar de que esta quieta
+        #self._moveIAPlayer()
 
     def _moveIAPlayer(self):
         ##Aqui pone a la IA a cocinar su jugada nasty
+        #let her cook
         newPosition=generateResponse(copy.copy(self.matriz),copy.copy(self.player),copy.copy(self.ia),self._showIAMovements())
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
            self.ia.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
-           self.coinsleft-=self.matriz[newPosition[0]][newPosition[1]]
+           self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
            if(self.coinPointsLeft==0):
                self.whoWon=self.calculateWhoWon()
         oldPosition=self.ia.getPosition()
@@ -52,7 +54,7 @@ class GameState:
 
     def showPlayerMovements(self):
         ##Posibles movimientos en L
-        patterns=[[-2,-1],[-2,1],[2,1],[2,-1]]
+        patterns=[[-1,-2],[-2,-1],[-2,1],[-1,2],[1,2],[2,1],[2,-1],[1,-2]]
         movements=[]
         position=self.player.getPosition()
         for n in patterns:
@@ -66,7 +68,7 @@ class GameState:
 
     ##Not sure if the methods below will be necessary
     def _showIAMovements(self):
-        patterns=[[-2,-1],[-2,1],[2,1],[2,-1]]
+        patterns=[[-1,-2],[-2,-1],[-2,1],[-1,2],[1,2],[2,1],[2,-1],[1,-2]]
         movements=[]
         position=self.player.getPosition()
         for n in patterns:
@@ -83,5 +85,13 @@ class GameState:
     
     def getMap(self):
         return copy.copy(self.matriz)
+    
+    def willigetcoin(self, newPosition):
+        if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
+            self.tookcoin= True
+        else:
+            self.tookcoin = False
+
+
     
 

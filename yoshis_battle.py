@@ -4,7 +4,8 @@ import tkinter.font as tkFont
 import random
 from gameState import GameState
 
-free_space = [
+def read_game():
+    free_space = [
     (0, 2), (0, 3), (0, 4), (0, 5),
     (1, 1), (1, 2), (1, 3), (1, 4), (1,5), (1,6),
     (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2,7),
@@ -13,12 +14,7 @@ free_space = [
     (5, 0), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (5, 6), (5,7),
     (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6),
     (7, 2), (7, 3), (7, 4), (7, 5)
-]
-
-
-
-
-def read_game():
+    ]
     with open('initGame.txt', 'r') as juego:
         lines = juego.readlines()
     matriz = [list(map(int, line.split())) for line in lines]
@@ -43,13 +39,57 @@ def load_images():
         3 : ImageTk.PhotoImage(file="media/supercoin.png"),
         #IAPlayer
         4 : ImageTk.PhotoImage(file="media/cpu.png"),
+        #Blocked Mov
+        5 : ImageTk.PhotoImage(file="media/blockedmov.png")
     }
     return img_dict
 
-def play(board):
-    return 1
+def calculate_index(movement):
+    row, col = movement
+    index = row * 8 + col
+    return index
+
+def move(newPosition, board, boxes):
+    #load images
+    img_dict = load_images()
+    #get old position
+    oldPosition = board.player.getPosition()
+    #get index of positions in the boxes array
+    oldIndex = calculate_index(oldPosition)
+    newIndex = calculate_index(newPosition)
+    #was i in a coin position?
+    if(board.tookcoin):
+        #just show blank image cause i wasnt in coin
+        boxes[oldIndex].configure(image=img_dict[5])
+        boxes[oldIndex].img = img_dict[5]
+        board.blocked_movements.append(oldPosition)
+    else:
+        #show that the movement is now blocked because i took a coin
+        boxes[oldIndex].configure(image=img_dict[0])
+        boxes[oldIndex].img = img_dict[0]
+    #Am i going to get a coin in this new position?
+    board.willigetcoin(newPosition)
+    #put player image in new position
+    boxes[newIndex].configure(image=img_dict[2])
+    boxes[newIndex].img = img_dict[2]
+    board.movePlayer(newPosition)
+    update(board, boxes)
+
+def update(board, boxes):   
+    for box in boxes:
+        box.unbind("<Button-1>") 
+    #all possible movements
+    allmovements = board.showPlayerMovements()
+    ia_pos = list(board.ia.getPosition())
+    #Movements that are not blocked and the player can use
+    movements = list(filter(lambda x: x not in board.blocked_movements and x!=ia_pos, allmovements))
+    for movement in movements:
+        index = calculate_index(movement)
+        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: move(newPosition, board, boxes))            
+
 
 def board_interface(board, frame):
+    box_labels = []
     img_dict = load_images()
     for i in range(8):
         for j in range(8):
@@ -58,6 +98,8 @@ def board_interface(board, frame):
             label = tk.Label(frame, image=imagen, borderwidth=1, relief="solid",)
             label.img = img_dict[numero]
             label.grid(row=i, column=j)
+            box_labels.append(label)
+    return box_labels
 
 def points(frame):
     font_size = tkFont.Font(size=16)
@@ -83,9 +125,9 @@ if __name__ == "__main__":
     frame_points = tk.Frame(root)
     frame_points.pack(side="bottom", fill="both")
     #Play
-    board_interface(board, frame_board)
+    boxes = board_interface(board, frame_board)
     points(frame_points)
-    play(board)
+    update(board, boxes)
 
     root.mainloop()
 
