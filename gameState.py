@@ -63,10 +63,6 @@ class GameState:
                 movements.append(newPosition)
         return movements
     
-
-
-
-    ##Not sure if the methods below will be necessary
     def _showIAMovements(self):
         patterns=[[-1,-2],[-2,-1],[-2,1],[-1,2],[1,2],[2,1],[2,-1],[1,-2]]
         movements=[]
