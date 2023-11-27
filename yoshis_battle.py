@@ -59,12 +59,13 @@ def move(newPosition, board, boxes):
     newIndex = calculate_index(newPosition)
     #was i in a coin position?
     if(board.tookcoin):
-        #just show blank image cause i wasnt in coin
+        #show that the movement is now blocked because i took a coin
         boxes[oldIndex].configure(image=img_dict[5])
         boxes[oldIndex].img = img_dict[5]
+        #Now this position is blocked
         board.blocked_movements.append(oldPosition)
     else:
-        #show that the movement is now blocked because i took a coin
+        #just show blank image cause i wasnt in coin
         boxes[oldIndex].configure(image=img_dict[0])
         boxes[oldIndex].img = img_dict[0]
     #Am i going to get a coin in this new position?
