@@ -12,7 +12,7 @@ class Node:
 
     def calcularHeuristica(self):
         #h(x)=(puntosrestantes + puntosIA)/3
-        h=(self.gameState.coinPointsLeft+self.gameState.ia.getCoins())/3
+        h=(self.gameState.coinPointsLeft+self.gameState.ai.getCoins())/3
         return h
     
     def expandir(self,newPosition,user:bool):

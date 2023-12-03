@@ -50,8 +50,7 @@ def calculate_index(movement):
     index = row * 8 + col
     return index
 
-def move(newPosition, board, boxes, user_coins):
-    print(board.player.getCoins())
+def move(newPosition, board, boxes, user_coins, cpu_coins):
     #load images
     img_dict = load_images()
     #get old position
@@ -76,21 +75,23 @@ def move(newPosition, board, boxes, user_coins):
     boxes[newIndex].configure(image=img_dict[2])
     boxes[newIndex].img = img_dict[2]
     board.movePlayer(newPosition)
-    update(board, boxes)
+    #Update player points and position visually
+    user_coins.set(f"Tú: {board.player.getCoins()}")
+    cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
+    update(board, boxes, user_coins, cpu_coins)
 
-def update(board, boxes, user_coins):   
+def update(board, boxes, user_coins, cpu_coins):   
     for box in boxes:
         box.unbind("<Button-1>") 
     #all possible movements
     allmovements = board.showPlayerMovements()
-    ia_pos = list(board.ia.getPosition())
     #Movements that are not blocked and the player can use
-    movements = list(filter(lambda x: x not in board.blocked_movements and x!=ia_pos, allmovements))
+    movements = list(filter(lambda x: x not in board.blocked_movements, allmovements))
     for movement in movements:
         index = calculate_index(movement)
-        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: move(newPosition, board, boxes, user_coins))            
+        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: move(newPosition, board, boxes, user_coins, cpu_coins))            
 
-
+#Set grid interface
 def board_interface(board, frame):
     box_labels = []
     img_dict = load_images()
@@ -106,23 +107,26 @@ def board_interface(board, frame):
 
 def points(frame, board):
     font_size = tkFont.Font(size=14)
+    #Title of frame
     title = tk.Label(frame, text="Puntuación --->", font=tkFont.Font(size=30))
-    cpu = tk.Label(frame, text="Cpu: 0", font=font_size)
-    #Listen player Get coins
-    user_coins = IntVar()
-    user_coins.set(f"Tú: {board.player.getCoins()}")
-    user = tk.Label(frame, textvariable=user_coins, font=font_size)
     title.grid(column=0, row=0, rowspan=2, sticky="w")
-    cpu.grid(sticky="e", column=1, row=0, padx=(80,0))
+    #Listen player getCoins()
+    user_coins = IntVar()
+    user = tk.Label(frame, textvariable=user_coins, font=font_size)
+    user_coins.set(f"Tú: {board.player.getCoins()}")
     user.grid(sticky="e", column=1, row=1, padx=(80,0))
-    return user_coins
-    
+    #Listen AI getCoins()
+    cpu_coins = IntVar()
+    cpu = tk.Label(frame, textvariable=cpu_coins, font=font_size)
+    cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
+    cpu.grid(sticky="e", column=1, row=0, padx=(80,0))
+    return user_coins, cpu_coins
+   
 
 if __name__ == "__main__":
     #InitGame
     board = read_game()
     
-
     #Root interface
     root = tk.Tk()
     root.title ("Yoshi's battle")
@@ -137,8 +141,8 @@ if __name__ == "__main__":
     frame_points.pack(side="bottom", fill="both")
     #Play
     boxes = board_interface(board, frame_board)
-    user_coins = points(frame_points, board)
-    update(board, boxes, user_coins)
+    user_coins, cpu_coins = points(frame_points, board)
+    update(board, boxes, user_coins, cpu_coins)
 
     root.mainloop()
 
