@@ -1,4 +1,5 @@
-from PIL import Image, ImageTk
+from PIL import ImageTk
+from tkinter import IntVar
 import tkinter as tk
 import tkinter.font as tkFont
 import random
@@ -49,7 +50,8 @@ def calculate_index(movement):
     index = row * 8 + col
     return index
 
-def move(newPosition, board, boxes):
+def move(newPosition, board, boxes, user_coins):
+    print(board.player.getCoins())
     #load images
     img_dict = load_images()
     #get old position
@@ -76,7 +78,7 @@ def move(newPosition, board, boxes):
     board.movePlayer(newPosition)
     update(board, boxes)
 
-def update(board, boxes):   
+def update(board, boxes, user_coins):   
     for box in boxes:
         box.unbind("<Button-1>") 
     #all possible movements
@@ -86,7 +88,7 @@ def update(board, boxes):
     movements = list(filter(lambda x: x not in board.blocked_movements and x!=ia_pos, allmovements))
     for movement in movements:
         index = calculate_index(movement)
-        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: move(newPosition, board, boxes))            
+        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: move(newPosition, board, boxes, user_coins))            
 
 
 def board_interface(board, frame):
@@ -102,11 +104,19 @@ def board_interface(board, frame):
             box_labels.append(label)
     return box_labels
 
-def points(frame):
-    font_size = tkFont.Font(size=16)
-    tk.Label(frame, text="Puntuación", font=font_size, anchor="w", background="blue", justify="center").pack(fill="both")
-    tk.Label(frame, text="aaaaa", font=font_size, anchor="w", background="red", justify="left").pack(fill="both")
-
+def points(frame, board):
+    font_size = tkFont.Font(size=14)
+    title = tk.Label(frame, text="Puntuación --->", font=tkFont.Font(size=30))
+    cpu = tk.Label(frame, text="Cpu: 0", font=font_size)
+    #Listen player Get coins
+    user_coins = IntVar()
+    user_coins.set(f"Tú: {board.player.getCoins()}")
+    user = tk.Label(frame, textvariable=user_coins, font=font_size)
+    title.grid(column=0, row=0, rowspan=2, sticky="w")
+    cpu.grid(sticky="e", column=1, row=0, padx=(80,0))
+    user.grid(sticky="e", column=1, row=1, padx=(80,0))
+    return user_coins
+    
 
 if __name__ == "__main__":
     #InitGame
@@ -127,8 +137,8 @@ if __name__ == "__main__":
     frame_points.pack(side="bottom", fill="both")
     #Play
     boxes = board_interface(board, frame_board)
-    points(frame_points)
-    update(board, boxes)
+    user_coins = points(frame_points, board)
+    update(board, boxes, user_coins)
 
     root.mainloop()
 

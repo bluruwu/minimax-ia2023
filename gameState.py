@@ -1,5 +1,5 @@
 from player import Player
-from response import generateResponse
+# from response import generateResponse
 import copy
 class GameState:
     #4 CPU
