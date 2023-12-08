@@ -36,18 +36,17 @@ class GameState:
         self.matriz[newPosition[0]][newPosition[1]]=2
 
     def _moveAIPlayer(self,newPosition):
-        return 0
 
         ##newPosition=generateResponse(copy.copy(self.matriz),copy.copy(self.player),copy.copy(self.ai),self._showAIMovements())
-        # if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
-        #    self.ai.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
-        #    self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
-        #    if(self.coinPointsLeft==0):
-        #        self.whoWon=self.calculateWhoWon()
-        # oldPosition=self.ai.getPosition()
-        # self.matriz[oldPosition[0]][oldPosition[1]]=0
-        # self.ai.movePlayer(newPosition)
-        # self.matriz[newPosition[0]][newPosition[1]]=4
+        if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
+            self.ai.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
+            self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
+            if(self.coinPointsLeft==0):
+                self.whoWon=self.calculateWhoWon()
+        oldPosition=self.ai.getPosition()
+        self.matriz[oldPosition[0]][oldPosition[1]]=0
+        self.ai.movePlayer(newPosition)
+        self.matriz[newPosition[0]][newPosition[1]]=4
 
     def showPlayerMovements(self):
         ##Posibles movimientos en L

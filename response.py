@@ -10,7 +10,9 @@ def generateResponse(game,difficulty):
     currentGame=game
     if(difficulty=='easy'):
         return generateEasyResponse(game)
-    while(queue):
+    while(len(queue)!=0):
+        expandedNodes.append(queue[0])
+        queue.pop(0)
         ##si la profundidad es menor a 4
         if(currentNode.getDepth()<=4):
             posibleMovements=currentGame._showAIMovements()
@@ -24,12 +26,7 @@ def generateResponse(game,difficulty):
                     ##Sale inmediatamente de la iteracion
                     break
                 # Añadir a la queue
-        expandedNodes.append(queue[0])
-        queue.pop(0)
         
-
-
-
     ###Funciones auxiliares
     def minmax(queue,type):
         if(type=='min'):
@@ -39,16 +36,15 @@ def generateResponse(game,difficulty):
         else:
             return print('Se debe ingresar un parametro "min"/"max"')
 
-
-    def max(arrayNode:List[Node]):
-        arrayNode.sort(key=lambda x:x.heuristica)
-        return arrayNode[0].heuristica
-
-    def min(arrayNode:List[Node]):
-        arrayNode.sort(key=lambda x:x.heuristica,reverse=True)
-        return arrayNode[0].heuristica
-
     return [0,0]
+
+def max(arrayNode:List[Node]):
+    arrayNode.sort(key=lambda x:x.heuristica)
+    return arrayNode[0].heuristica
+
+def min(arrayNode:List[Node]):
+    arrayNode.sort(key=lambda x:x.heuristica,reverse=True)
+    return arrayNode[0].heuristica
 
 
 def generateEasyResponse(game):
@@ -57,7 +53,6 @@ def generateEasyResponse(game):
 
     currentNode=Node(game,None)
     queue.append(currentNode)
-    expandedNodes=[]
     currentGame=game
     posibleMovements=currentGame._showAIMovements()
     for n in range(len(posibleMovements)):

@@ -6,19 +6,22 @@ class Node:
         self.path=[]
         self.father=father
         self.gameState=game
-        self.heuristica=self.calcularHeuristica()
+        self.heuristica=None
         self.accumulatedcost=0
         ##si es un nodo Min o un nodo Max
         self.nodeType=nodeType
         
-
+    ##Calcula pero no le asigna al nodo!!!
     def calcularHeuristica(self):
         #h(x)=(puntosrestantes + puntosIA)/3
         h=(self.gameState.coinPointsLeft+self.gameState.ai.getCoins())/3
         return h
+    def setHeuristica(self,number):
+        self.heuristica=number
+
     def getDepth(self):
         return self.depth
-    def expandir(self,newPosition,user:bool):
+    def expandir(self,newPosition):
         ##who especifica si en el escenario mueve el usuario o la IA que ser
         hijoMapa=copy.copy(self.gameState)
         hijoPlayer=self.gameState.getPlayer()
