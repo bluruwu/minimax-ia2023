@@ -4,6 +4,7 @@ import tkinter as tk
 import tkinter.font as tkFont
 import random
 from gameState import GameState
+from response import generateResponse
 
 def read_game():
     free_space = [

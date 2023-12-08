@@ -1,5 +1,4 @@
 from player import Player
-from response import generateResponse
 import copy
 class GameState:
     #4 CPU
@@ -35,12 +34,11 @@ class GameState:
         self.matriz[oldPosition[0]][oldPosition[1]]=0
         self.player.movePlayer(newPosition)
         self.matriz[newPosition[0]][newPosition[1]]=2
-        self._moveAIPlayer()
 
-    def _moveAIPlayer(self):
-        ##Aqui pone a la IA a cocinar su jugada nasty
-        #let her cook
-        newPosition=generateResponse(copy.copy(self.matriz),copy.copy(self.player),copy.copy(self.ai),self._showAIMovements())
+    def _moveAIPlayer(self,newPosition):
+        return 0
+
+        ##newPosition=generateResponse(copy.copy(self.matriz),copy.copy(self.player),copy.copy(self.ai),self._showAIMovements())
         # if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
         #    self.ai.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
         #    self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
