@@ -2,6 +2,7 @@ class Player:
     def __init__(self, position) -> None:
         self.position=position
         self.coins=0
+        self.tookcoin = False
     
     def giveCoin(self,coinValue):
         self.coins+=coinValue

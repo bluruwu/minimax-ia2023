@@ -1,17 +1,17 @@
 from player import Player
-from response import generateResponse
 import copy
 class GameState:
     #4 CPU
     #2 User
     def __init__(self, matriz,playerPosition,aiPosition):
         self.coinPointsLeft=24
+        self.specialCoinsLeft= 4
+        self.normalCoinsLeft= 12
         self.player=Player(playerPosition)
         self.ai=Player(aiPosition)
         self.matriz = matriz
         self.blocked_movements = []
         self.whoWon='NotYet'
-        self.tookcoin = False
         self
 
     def calculateWhoWon(self):
@@ -26,6 +26,11 @@ class GameState:
          
     
     def movePlayer(self,newPosition):
+        if((self.matriz[newPosition[0]][newPosition[1]])==1):
+            self.normalCoinsLeft-=1
+        elif ((self.matriz[newPosition[0]][newPosition[1]])==3):
+            self.specialCoinsLeft-=1
+    
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
            self.player.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
            self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
@@ -35,21 +40,22 @@ class GameState:
         self.matriz[oldPosition[0]][oldPosition[1]]=0
         self.player.movePlayer(newPosition)
         self.matriz[newPosition[0]][newPosition[1]]=2
-        self._moveAIPlayer()
 
-    def _moveAIPlayer(self):
-        ##Aqui pone a la IA a cocinar su jugada nasty
-        #let her cook
-        newPosition=generateResponse(copy.copy(self.matriz),copy.copy(self.player),copy.copy(self.ai),self._showAIMovements())
-        # if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
-        #    self.ai.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
-        #    self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
-        #    if(self.coinPointsLeft==0):
-        #        self.whoWon=self.calculateWhoWon()
-        # oldPosition=self.ai.getPosition()
-        # self.matriz[oldPosition[0]][oldPosition[1]]=0
-        # self.ai.movePlayer(newPosition)
-        # self.matriz[newPosition[0]][newPosition[1]]=4
+    def _moveAIPlayer(self,newPosition):
+        self.ai.getCoins()
+        if((self.matriz[newPosition[0]][newPosition[1]])==1):
+            self.normalCoinsLeft-=1
+        elif ((self.matriz[newPosition[0]][newPosition[1]])==3):
+            self.specialCoinsLeft-=1
+        if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
+            self.ai.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
+            self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
+            if(self.coinPointsLeft==0):
+                self.whoWon=self.calculateWhoWon()
+        oldPosition=self.ai.getPosition()
+        self.matriz[oldPosition[0]][oldPosition[1]]=0
+        self.ai.movePlayer(newPosition)
+        self.matriz[newPosition[0]][newPosition[1]]=4
 
     def showPlayerMovements(self):
         ##Posibles movimientos en L
@@ -61,6 +67,7 @@ class GameState:
             newPosition=[position[0]+n[0],position[1]+n[1]]
             if((newPosition[0]>=0 and newPosition[1]>=0) and (newPosition[0]<=7 and newPosition[1]<=7) and newPosition!=ai_position):
                 movements.append(newPosition)
+        movements = filter(lambda x: x not in self.blocked_movements, movements)
         return movements
     
     def _showAIMovements(self):
@@ -72,7 +79,14 @@ class GameState:
             newPosition=[position[0]+n[0],position[1]+n[1]]
             if((newPosition[0]>=0 and newPosition[1]>=0) and (newPosition[0]<=7 and newPosition[1]<=7) and newPosition!=player_position):
                 movements.append(newPosition)
+        movements = filter(lambda x: x not in self.blocked_movements, movements)
         return movements
+    
+    def getPlayerPosition(self):
+        return self.player.getPosition()
+    
+    def getAIPosition(self):
+        return self.ai.getPosition()
     
     def getPlayer(self):
         return copy.copy(self.player)
@@ -83,11 +97,11 @@ class GameState:
     def getMap(self):
         return copy.copy(self.matriz)
     
-    def willigetcoin(self, newPosition):
+    def willigetcoin(self, newPosition, user):
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
-            self.tookcoin= True
+            user.tookcoin= True
         else:
-            self.tookcoin = False
+            user.tookcoin = False
 
 
     

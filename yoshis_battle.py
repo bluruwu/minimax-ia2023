@@ -4,6 +4,8 @@ import tkinter as tk
 import tkinter.font as tkFont
 import random
 from gameState import GameState
+import copy
+from response import generateResponse
 
 def read_game():
     free_space = [
@@ -50,16 +52,37 @@ def calculate_index(movement):
     index = row * 8 + col
     return index
 
-def move(newPosition, board, boxes, user_coins, cpu_coins):
-    #load images
-    img_dict = load_images()
-    #get old position
-    oldPosition = board.player.getPosition()
+def moveAI(board, img_dict, boxes, newPosition, cpu_coins):
+    oldPosition = board.ai.getPosition()
+    oldIndex = calculate_index(oldPosition)
+    newIndex = calculate_index(newPosition)
+    #was i in a coin position?
+    if(board.ai.tookcoin):
+        #show that the movement is now blocked because i took a coin
+        boxes[oldIndex].configure(image=img_dict[5])
+        boxes[oldIndex].img = img_dict[5]
+        #Now this position is blocked
+        board.blocked_movements.append(oldPosition)
+    else:
+        #just show blank image cause i wasnt in coin
+        boxes[oldIndex].configure(image=img_dict[0])
+        boxes[oldIndex].img = img_dict[0]
+    board.willigetcoin(newPosition, board.ai)
+    boxes[newIndex].configure(image=img_dict[4])
+    boxes[newIndex].img = img_dict[4]
+    board._moveAIPlayer(newPosition)
+    #Update ai coins visually
+    cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
+
+
+def movePlayer(newPosition, board, boxes, user_coins, cpu_coins):
+    img_dict = load_images() #Load Images
+    oldPosition = board.player.getPosition() 
     #get index of positions in the boxes array
     oldIndex = calculate_index(oldPosition)
     newIndex = calculate_index(newPosition)
     #was i in a coin position?
-    if(board.tookcoin):
+    if(board.player.tookcoin):
         #show that the movement is now blocked because i took a coin
         boxes[oldIndex].configure(image=img_dict[5])
         boxes[oldIndex].img = img_dict[5]
@@ -70,26 +93,29 @@ def move(newPosition, board, boxes, user_coins, cpu_coins):
         boxes[oldIndex].configure(image=img_dict[0])
         boxes[oldIndex].img = img_dict[0]
     #Am i going to get a coin in this new position?
-    board.willigetcoin(newPosition)
+    board.willigetcoin(newPosition, board.player)
     #put player image in new position
     boxes[newIndex].configure(image=img_dict[2])
     boxes[newIndex].img = img_dict[2]
     board.movePlayer(newPosition)
-    #Update player points and position visually
+    #Update user coins visually
     user_coins.set(f"Tú: {board.player.getCoins()}")
-    cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
+    #MOVE AI
+    #Generate best move
+    _ , positionAI = generateResponse(copy.deepcopy(board),6)
+    moveAI(board, img_dict, boxes, positionAI, cpu_coins)
+    #Next move
     update(board, boxes, user_coins, cpu_coins)
+    
 
 def update(board, boxes, user_coins, cpu_coins):   
     for box in boxes:
         box.unbind("<Button-1>") 
     #all possible movements
     allmovements = board.showPlayerMovements()
-    #Movements that are not blocked and the player can use
-    movements = list(filter(lambda x: x not in board.blocked_movements, allmovements))
-    for movement in movements:
+    for movement in allmovements:
         index = calculate_index(movement)
-        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: move(newPosition, board, boxes, user_coins, cpu_coins))            
+        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins, cpu_coins))            
 
 #Set grid interface
 def board_interface(board, frame):
