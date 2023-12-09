@@ -10,7 +10,6 @@ class GameState:
         self.matriz = matriz
         self.blocked_movements = []
         self.whoWon='NotYet'
-        self.tookcoin = False
         self
 
     def calculateWhoWon(self):
@@ -36,8 +35,6 @@ class GameState:
         self.matriz[newPosition[0]][newPosition[1]]=2
 
     def _moveAIPlayer(self,newPosition):
-
-        ##newPosition=generateResponse(copy.copy(self.matriz),copy.copy(self.player),copy.copy(self.ai),self._showAIMovements())
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
             self.ai.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
             self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]
@@ -58,6 +55,7 @@ class GameState:
             newPosition=[position[0]+n[0],position[1]+n[1]]
             if((newPosition[0]>=0 and newPosition[1]>=0) and (newPosition[0]<=7 and newPosition[1]<=7) and newPosition!=ai_position):
                 movements.append(newPosition)
+        movements = filter(lambda x: x not in self.blocked_movements, movements)
         return movements
     
     def _showAIMovements(self):
@@ -69,11 +67,15 @@ class GameState:
             newPosition=[position[0]+n[0],position[1]+n[1]]
             if((newPosition[0]>=0 and newPosition[1]>=0) and (newPosition[0]<=7 and newPosition[1]<=7) and newPosition!=player_position):
                 movements.append(newPosition)
+        movements = filter(lambda x: x not in self.blocked_movements, movements)
         return movements
+    
     def getPlayerPosition(self):
         return self.player.getPosition()
+    
     def getAIPosition(self):
         return self.ai.getPosition()
+    
     def getPlayer(self):
         return copy.copy(self.player)
     
@@ -83,11 +85,11 @@ class GameState:
     def getMap(self):
         return copy.copy(self.matriz)
     
-    def willigetcoin(self, newPosition):
+    def willigetcoin(self, newPosition, user):
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
-            self.tookcoin= True
+            user.tookcoin= True
         else:
-            self.tookcoin = False
+            user.tookcoin = False
 
 
     

@@ -8,38 +8,38 @@ def generateResponse(game,difficulty):
 
 def minimax(node:Node, depth,alpha,beta,maximizing):
     if(depth==0 or node.gameState.coinPointsLeft==0):
-        return node.calcularHeuristica()
-    if(maximizing==True):
+        return node.calcularHeuristica(), None
+    if maximizing:
         maxEval=float('-inf')
+        best_move = None
         posibleMovements=node.gameState._showAIMovements()
         for n in posibleMovements:
-            eval=minimax(node.expandir(n),depth-1,alpha,beta,False)
-            maxEval=max(alpha,eval)
-            alpha=max(alpha,eval)
+            eval, _=minimax(node.expandir(n),depth-1,alpha,beta,False)
+            if eval > maxEval:
+                maxEval = eval
+                best_move = n
+            alpha=max_heuristic(alpha,eval)
             if(beta<=alpha):
                 break
-        return maxEval
+        return maxEval, best_move
     else:
         minEval=float('inf')
         posibleMovements=node.gameState.showPlayerMovements()
+        best_move = None
         for n in posibleMovements:
-            eval=minimax(node.expandir(n),depth-1,alpha,beta,True)
-            minEval=min(minEval,eval)
-            beta=min(beta,eval)
+            eval, _=minimax(node.expandir(n),depth-1,alpha,beta,True)
+            if eval < minEval:
+                minEval = eval
+                best_move = n
+            beta=min_heuristic(beta,eval)
             if (beta<=alpha):
                 break
-        return minEval
+        return minEval, best_move
 
 
 
-def max(heuristica1,heuristica2):
-    if(heuristica1>heuristica2):
-        return heuristica1
-    else:
-        return heuristica2
+def max_heuristic(heuristica1,heuristica2):
+    return max(heuristica1, heuristica2)
     
-def min(heuristica1,heuristica2):
-    if(heuristica1<heuristica2):
-        return heuristica1
-    else:
-        return heuristica2
+def min_heuristic(heuristica1,heuristica2):
+    return min(heuristica1,heuristica2)
