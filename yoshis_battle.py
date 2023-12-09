@@ -4,6 +4,7 @@ import tkinter as tk
 import tkinter.font as tkFont
 import random
 from gameState import GameState
+import copy
 from response import generateResponse
 
 def read_game():
@@ -79,7 +80,9 @@ def move(newPosition, board, boxes, user_coins, cpu_coins):
     #Update player points and position visually
     user_coins.set(f"Tú: {board.player.getCoins()}")
     cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
+    generateResponse(copy.deepcopy(board),4)
     update(board, boxes, user_coins, cpu_coins)
+    
 
 def update(board, boxes, user_coins, cpu_coins):   
     for box in boxes:

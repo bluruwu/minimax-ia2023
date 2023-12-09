@@ -70,7 +70,10 @@ class GameState:
             if((newPosition[0]>=0 and newPosition[1]>=0) and (newPosition[0]<=7 and newPosition[1]<=7) and newPosition!=player_position):
                 movements.append(newPosition)
         return movements
-    
+    def getPlayerPosition(self):
+        return self.player.getPosition()
+    def getAIPosition(self):
+        return self.ai.getPosition()
     def getPlayer(self):
         return copy.copy(self.player)
     
