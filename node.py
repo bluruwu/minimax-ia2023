@@ -12,9 +12,13 @@ class Node:
         
     ##Calcula pero no le asigna al nodo!!!
     def calcularHeuristica(self):
-        #h(x)=(puntosrestantes + puntosIA)/3
-        h=(self.gameState.coinPointsLeft+self.gameState.ai.getCoins())/3
-        return h
+        special_coins = self.gameState.specialCoinsLeft
+        normal_coins = self.gameState.normalCoinsLeft
+        ai_coins = self.gameState.ai.getCoins()
+        print(f"Monedas:  {special_coins} Normales {normal_coins} Ai {ai_coins}")
+        heuristic_value = special_coins + normal_coins + ai_coins
+        self.setHeuristica(heuristic_value)
+        return heuristic_value
     
     def setHeuristica(self,number):
         self.heuristica=number
@@ -24,11 +28,11 @@ class Node:
     
     def expandir(self,newPosition):
         FutureGame=copy.copy(self.gameState)
-        ##if(user==True):
         if(self.nodeType=='min'):
             FutureGame.movePlayer(newPosition)  
         else:
             FutureGame._moveAIPlayer(newPosition)  
+
         if self.nodeType=='max':
             newNodeType='min'
         else:

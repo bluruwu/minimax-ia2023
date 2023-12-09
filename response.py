@@ -8,7 +8,9 @@ def generateResponse(game,difficulty):
 
 def minimax(node:Node, depth,alpha,beta,maximizing):
     if(depth==0 or node.gameState.coinPointsLeft==0):
-        return node.calcularHeuristica(), None
+        heuristica = node.calcularHeuristica()
+        node.setHeuristica(heuristica)
+        return heuristica, None
     if maximizing:
         maxEval=float('-inf')
         best_move = None
