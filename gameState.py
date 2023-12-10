@@ -28,8 +28,10 @@ class GameState:
     def movePlayer(self,newPosition):
         if((self.matriz[newPosition[0]][newPosition[1]])==1):
             self.normalCoinsLeft-=1
+            self.player.normal_coins+=1
         elif ((self.matriz[newPosition[0]][newPosition[1]])==3):
             self.specialCoinsLeft-=1
+            self.player.special_coins+=1
     
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
            self.player.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
@@ -42,11 +44,14 @@ class GameState:
         self.matriz[newPosition[0]][newPosition[1]]=2
 
     def _moveAIPlayer(self,newPosition):
-        self.ai.getCoins()
         if((self.matriz[newPosition[0]][newPosition[1]])==1):
             self.normalCoinsLeft-=1
+            self.ai.normal_coins+=1
+
         elif ((self.matriz[newPosition[0]][newPosition[1]])==3):
             self.specialCoinsLeft-=1
+            self.ai.special_coins+=1
+
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
             self.ai.giveCoin(self.matriz[newPosition[0]][newPosition[1]])
             self.coinPointsLeft-=self.matriz[newPosition[0]][newPosition[1]]

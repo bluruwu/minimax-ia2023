@@ -54,7 +54,8 @@ def calculate_index(movement):
     index = row * 8 + col
     return index
 
-def moveAI(board, img_dict, boxes, newPosition, cpu_coins):
+def moveAI(board, boxes, newPosition, cpu_coins):
+    img_dict = load_images()
     oldPosition = board.ai.getPosition()
     oldIndex = calculate_index(oldPosition)
     newIndex = calculate_index(newPosition)
@@ -77,7 +78,7 @@ def moveAI(board, img_dict, boxes, newPosition, cpu_coins):
     cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
 
 
-def movePlayer(newPosition, board, boxes, user_coins, cpu_coins):
+def movePlayer(newPosition, board, boxes, user_coins):
     img_dict = load_images() #Load Images
     oldPosition = board.player.getPosition() 
     #get index of positions in the boxes array
@@ -102,40 +103,35 @@ def movePlayer(newPosition, board, boxes, user_coins, cpu_coins):
     board.movePlayer(newPosition)
     #Update user coins visually
     user_coins.set(f"Tú: {board.player.getCoins()}")
-    #MOVE AI
-    #Generate best move
-    _ , positionAI = generateResponse(copy.deepcopy(board),difficulty)
-    moveAI(board, img_dict, boxes, positionAI, cpu_coins)
     #Next move
     update(board, boxes, user_coins, cpu_coins)
     
 
 def update(board, boxes, user_coins, cpu_coins):   
+    #MOVE AI
+    #Generate best move
+    _ , positionAI = generateResponse(copy.deepcopy(board),difficulty)
+    moveAI(board, boxes, positionAI, cpu_coins)
+
     for box in boxes:
         box.unbind("<Button-1>") 
     #all possible movements
     allmovements = board.showPlayerMovements()
     for movement in allmovements:
         index = calculate_index(movement)
-        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins, cpu_coins))            
-
+        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins))            
 
 
 def selectDifficulty():
     franja=tk.Frame(root, bg="lightgray", height=207)
     franja.config(width=415)
     franja.place(relx=0.5, rely=0.44, anchor="center")
-    easyButton= tk.Button(franja, text="Easy", command=lambda: changeDifficulty(franja,2,difficulty),width=25,height=10)
+    easyButton= tk.Button(franja, text="Easy", command=lambda: changeDifficulty(franja,2),width=25,height=10)
     easyButton.pack(side="left", padx=10)
     franja.pack_propagate(False)
-
-    hardButton= tk.Button(franja, text="Hard", command=lambda: changeDifficulty(franja,4,difficulty),width=25,height=10)
+    #Falta Intermedio
+    hardButton= tk.Button(franja, text="Hard", command=lambda: changeDifficulty(franja,6),width=25,height=10)
     hardButton.pack(side="right", padx=10)
-
-def changeDifficulty(franja,number,difficultytoChange):
-    difficultytoChange = number
-    franja.destroy()
-
 
 #Set grid interface
 def board_interface(board, frame):
@@ -167,7 +163,11 @@ def points(frame, board):
     cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
     cpu.grid(sticky="e", column=1, row=0, padx=(80,0))
     return user_coins, cpu_coins
-   
+
+def changeDifficulty(franja,number):
+    global difficulty
+    difficulty = number
+    franja.destroy()
 
 if __name__ == "__main__":
     #InitGame
@@ -182,6 +182,7 @@ if __name__ == "__main__":
     frame_board = tk.Frame(root)
     frame_board.pack()
     root.columnconfigure(0, weight=1)
+    #Select difficulty
     selectDifficulty()
     #Points
     frame_points = tk.Frame(root)
