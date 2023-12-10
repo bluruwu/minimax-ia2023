@@ -7,6 +7,8 @@ from gameState import GameState
 import copy
 from response import generateResponse
 
+difficulty=2
+
 def read_game():
     free_space = [
     (0, 2), (0, 3), (0, 4), (0, 5),
@@ -64,7 +66,7 @@ def moveAI(board, img_dict, boxes, newPosition, cpu_coins):
         #Now this position is blocked
         board.blocked_movements.append(oldPosition)
     else:
-        #just show blank image cause i wasnt in coin
+        #just show blank image cause it wasnt in coin
         boxes[oldIndex].configure(image=img_dict[0])
         boxes[oldIndex].img = img_dict[0]
     board.willigetcoin(newPosition, board.ai)
@@ -102,7 +104,7 @@ def movePlayer(newPosition, board, boxes, user_coins, cpu_coins):
     user_coins.set(f"Tú: {board.player.getCoins()}")
     #MOVE AI
     #Generate best move
-    _ , positionAI = generateResponse(copy.deepcopy(board),6)
+    _ , positionAI = generateResponse(copy.deepcopy(board),difficulty)
     moveAI(board, img_dict, boxes, positionAI, cpu_coins)
     #Next move
     update(board, boxes, user_coins, cpu_coins)
@@ -117,6 +119,24 @@ def update(board, boxes, user_coins, cpu_coins):
         index = calculate_index(movement)
         boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins, cpu_coins))            
 
+
+
+def selectDifficulty():
+    franja=tk.Frame(root, bg="lightgray", height=207)
+    franja.config(width=415)
+    franja.place(relx=0.5, rely=0.44, anchor="center")
+    easyButton= tk.Button(franja, text="Easy", command=lambda: changeDifficulty(franja,2,difficulty),width=25,height=10)
+    easyButton.pack(side="left", padx=10)
+    franja.pack_propagate(False)
+
+    hardButton= tk.Button(franja, text="Hard", command=lambda: changeDifficulty(franja,4,difficulty),width=25,height=10)
+    hardButton.pack(side="right", padx=10)
+
+def changeDifficulty(franja,number,difficultytoChange):
+    difficultytoChange = number
+    franja.destroy()
+
+
 #Set grid interface
 def board_interface(board, frame):
     box_labels = []
@@ -128,7 +148,7 @@ def board_interface(board, frame):
             label = tk.Label(frame, image=imagen, borderwidth=1, relief="solid",)
             label.img = img_dict[numero]
             label.grid(row=i, column=j)
-            box_labels.append(label)
+            box_labels.append(label) 
     return box_labels
 
 def points(frame, board):
@@ -161,7 +181,8 @@ if __name__ == "__main__":
     #Frame Grid
     frame_board = tk.Frame(root)
     frame_board.pack()
-
+    root.columnconfigure(0, weight=1)
+    selectDifficulty()
     #Points
     frame_points = tk.Frame(root)
     frame_points.pack(side="bottom", fill="both")
@@ -171,4 +192,15 @@ if __name__ == "__main__":
     update(board, boxes, user_coins, cpu_coins)
 
     root.mainloop()
+
+
+
+
+
+
+
+
+
+
+
 
