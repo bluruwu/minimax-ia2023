@@ -10,13 +10,20 @@ class Node:
         self.heuristica=None
         self.nodeType=nodeType
         
-    ##Calcula pero no le asigna al nodo!!!
     def calcularHeuristica(self):
-        special_coins = self.gameState.specialCoinsLeft
-        normal_coins = self.gameState.normalCoinsLeft
-        ai_coins = self.gameState.ai.getCoins()
-        print(f"Monedas:  {special_coins} Normales {normal_coins} Ai {ai_coins}")
-        heuristic_value = special_coins + normal_coins + ai_coins
+        ai_special = self.gameState.ai.getSpecialCoins()
+        ai_normal = self.gameState.ai.getNormalCoins()
+        player_special = self.gameState.player.getSpecialCoins()
+        player_normal = self.gameState.player.getNormalCoins()
+        iapoints = self.gameState.ai.getCoins()
+        playerpoints = self.gameState.player.getCoins()
+        coinsleft = self.gameState.coinPointsLeft
+
+        # heuristic_value = (1/self.depth + 1)+iapoints+(1/coinsleft +1)
+        # print("Soy profundidad", self.depth)
+        heuristic_value = (ai_special * 3 + ai_normal) - (player_special * 3 + player_normal) + (iapoints - playerpoints) - (1 * self.depth)
+        # print(f"Heuristica {heuristic_value}")
+
         self.setHeuristica(heuristic_value)
         return heuristic_value
     
@@ -27,7 +34,7 @@ class Node:
         return self.depth
     
     def expandir(self,newPosition):
-        FutureGame=copy.copy(self.gameState)
+        FutureGame=copy.deepcopy(self.gameState)
         if(self.nodeType=='min'):
             FutureGame.movePlayer(newPosition)  
         else:

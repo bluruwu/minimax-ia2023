@@ -6,6 +6,11 @@ import random
 from gameState import GameState
 import copy
 from response import generateResponse
+from tkinter import simpledialog
+from tkinter import messagebox
+
+depth = None
+selected_difficulty = None
 
 def read_game():
     free_space = [
@@ -52,7 +57,8 @@ def calculate_index(movement):
     index = row * 8 + col
     return index
 
-def moveAI(board, img_dict, boxes, newPosition, cpu_coins):
+def moveAI(board, boxes, newPosition, cpu_coins):
+    img_dict = load_images()
     oldPosition = board.ai.getPosition()
     oldIndex = calculate_index(oldPosition)
     newIndex = calculate_index(newPosition)
@@ -64,7 +70,7 @@ def moveAI(board, img_dict, boxes, newPosition, cpu_coins):
         #Now this position is blocked
         board.blocked_movements.append(oldPosition)
     else:
-        #just show blank image cause i wasnt in coin
+        #just show blank image cause it wasnt in coin
         boxes[oldIndex].configure(image=img_dict[0])
         boxes[oldIndex].img = img_dict[0]
     board.willigetcoin(newPosition, board.ai)
@@ -75,7 +81,7 @@ def moveAI(board, img_dict, boxes, newPosition, cpu_coins):
     cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
 
 
-def movePlayer(newPosition, board, boxes, user_coins, cpu_coins):
+def movePlayer(newPosition, board, boxes, user_coins):
     img_dict = load_images() #Load Images
     oldPosition = board.player.getPosition() 
     #get index of positions in the boxes array
@@ -100,23 +106,66 @@ def movePlayer(newPosition, board, boxes, user_coins, cpu_coins):
     board.movePlayer(newPosition)
     #Update user coins visually
     user_coins.set(f"Tú: {board.player.getCoins()}")
-    #MOVE AI
-    #Generate best move
-    _ , positionAI = generateResponse(copy.deepcopy(board),6)
-    moveAI(board, img_dict, boxes, positionAI, cpu_coins)
     #Next move
     update(board, boxes, user_coins, cpu_coins)
     
 
-def update(board, boxes, user_coins, cpu_coins):   
-    for box in boxes:
-        box.unbind("<Button-1>") 
-    #all possible movements
-    allmovements = board.showPlayerMovements()
-    for movement in allmovements:
-        index = calculate_index(movement)
-        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins, cpu_coins))            
+def update(board, boxes, user_coins, cpu_coins):
+    if(board.whoWon!='NotYet'):
+        for box in boxes:
+            box.unbind("<Button-1>")
+        showWinner(f'{board.whoWon}') 
+    else:    
+        #MOVE AI
+        #Generate best move
+        _ , positionAI = generateResponse(copy.deepcopy(board),depth)
+        moveAI(board, boxes, positionAI, cpu_coins)
+        for box in boxes:
+            box.unbind("<Button-1>") 
+        #all possible movements
+        allmovements = board.showPlayerMovements()
+        for movement in allmovements:
+            index = calculate_index(movement)
+            boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins))    
 
+
+def showWinner(who):
+    franja=tk.Frame(root, bg="lightgray", height=207)
+    franja.config(width=415)
+    franja.place(relx=0.5, rely=0.44, anchor="center")
+    franja.pack_propagate(False)
+    fuente_grande = ("Helvetica", 20)
+    winnerLabel = tk.Label(franja, text=f'Ganador: {who}', font=fuente_grande, bg="lightgray")
+    winnerLabel.pack(pady=10, anchor="center")
+
+
+def selectDifficulty():
+    global depth, selected_difficulty
+    difficulty_str = simpledialog.askstring("Dificultad", "Selecciona la dificultad (1: Fácil, 2: Normal, 3: Difícil):")
+    if difficulty_str is not None:
+        try:
+            selectDifficulty = int(difficulty_str)
+            if 1 <= selectDifficulty <= 3:
+                if selectDifficulty == 1:
+                    depth_value = 2
+                if selectDifficulty == 2:
+                    depth_value = 4
+                elif selectDifficulty == 3:
+                    depth_value = 6
+                changeDifficulty(depth_value)
+            else:
+                # Handle other difficulty values as needed
+                    changeDifficulty(2)
+                    print("Error")
+                    messagebox.showwarning("Advertencia", "Valor de dificultad no reconocido. Se ha establecido como Facil.")
+        except ValueError:
+            # Handle the case where the input is not a valid integer
+            print("Por favor, ingresa un número válido.")
+
+def changeDifficulty(number):
+    global depth
+    depth = number
+    
 #Set grid interface
 def board_interface(board, frame):
     box_labels = []
@@ -128,7 +177,7 @@ def board_interface(board, frame):
             label = tk.Label(frame, image=imagen, borderwidth=1, relief="solid",)
             label.img = img_dict[numero]
             label.grid(row=i, column=j)
-            box_labels.append(label)
+            box_labels.append(label) 
     return box_labels
 
 def points(frame, board):
@@ -147,7 +196,6 @@ def points(frame, board):
     cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
     cpu.grid(sticky="e", column=1, row=0, padx=(80,0))
     return user_coins, cpu_coins
-   
 
 if __name__ == "__main__":
     #InitGame
@@ -161,7 +209,9 @@ if __name__ == "__main__":
     #Frame Grid
     frame_board = tk.Frame(root)
     frame_board.pack()
-
+    root.columnconfigure(0, weight=1)
+    #Select difficulty
+    selectDifficulty()
     #Points
     frame_points = tk.Frame(root)
     frame_points.pack(side="bottom", fill="both")
@@ -171,4 +221,15 @@ if __name__ == "__main__":
     update(board, boxes, user_coins, cpu_coins)
 
     root.mainloop()
+
+
+
+
+
+
+
+
+
+
+
 
