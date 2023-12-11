@@ -6,9 +6,10 @@ import random
 from gameState import GameState
 import copy
 from response import generateResponse
-
-difficulty=2
-
+from tkinter import simpledialog
+from tkinter import messagebox
+difficulty = None
+selected_difficulty = None
 def read_game():
     free_space = [
     (0, 2), (0, 3), (0, 4), (0, 5),
@@ -123,16 +124,47 @@ def update(board, boxes, user_coins, cpu_coins):
 
 
 def selectDifficulty():
-    franja=tk.Frame(root, bg="lightgray", height=207)
-    franja.config(width=415)
-    franja.place(relx=0.5, rely=0.44, anchor="center")
-    easyButton= tk.Button(franja, text="Easy", command=lambda: changeDifficulty(franja,2),width=25,height=10)
-    easyButton.pack(side="left", padx=10)
-    franja.pack_propagate(False)
-    #Falta Intermedio
-    hardButton= tk.Button(franja, text="Hard", command=lambda: changeDifficulty(franja,6),width=25,height=10)
-    hardButton.pack(side="right", padx=10)
+    global difficulty, selected_difficulty
+    difficulty_str = simpledialog.askstring("Dificultad", "Selecciona la dificultad (1: Fácil, 2: Normal, 3: Difícil):")
+    
+    if difficulty_str is not None:
+        try:
+            difficulty = int(difficulty_str)
+            if 1 <= difficulty <= 3:
+                franja = tk.Frame(root, bg="lightgray", height=207)
+                franja.config(width=415)
+                franja.place(relx=0.5, rely=0.44, anchor="center")
+                
+                if difficulty == 1:
+                    button_text = "Easy"
+                    difficulty_value = 2
+                if difficulty == 2:
+                    button_text = "Normal"
+                    difficulty_value = 4
+                elif difficulty == 3:
+                    button_text = "Hard"
+                    difficulty_value = 6
 
+
+                
+                    
+                changeDifficulty(franja, difficulty_value)
+                
+                
+                global selected_difficulty
+                selected_difficulty = difficulty
+                franja.destroy()
+                print(difficulty)
+            else:
+                # Handle other difficulty values as needed
+                    button_text = "Unknown"
+                    difficulty_value = None
+                    print("ERRORRRRR")
+                    messagebox.showwarning("Advertencia", "Valor de dificultad no reconocido. Se ha establecido como desconocido.")
+ 
+        except ValueError:
+            # Handle the case where the input is not a valid integer
+            print("Por favor, ingresa un número válido.")
 #Set grid interface
 def board_interface(board, frame):
     box_labels = []
