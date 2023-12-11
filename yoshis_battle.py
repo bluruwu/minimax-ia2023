@@ -108,30 +108,49 @@ def movePlayer(newPosition, board, boxes, user_coins):
     
 
 def update(board, boxes, user_coins, cpu_coins):   
-    #MOVE AI
-    #Generate best move
     _ , positionAI = generateResponse(copy.deepcopy(board),difficulty)
     moveAI(board, boxes, positionAI, cpu_coins)
+    if(board.whoWon!='NotYet'):
+        for box in boxes:
+            box.unbind("<Button-1>")
+        showWinner(f'{board.whoWon}') 
+    else:    
+        #MOVE AI
+        #Generate best move
+        
 
-    for box in boxes:
-        box.unbind("<Button-1>") 
-    #all possible movements
-    allmovements = board.showPlayerMovements()
-    for movement in allmovements:
-        index = calculate_index(movement)
-        boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins))            
+        for box in boxes:
+            box.unbind("<Button-1>") 
+        #all possible movements
+        allmovements = board.showPlayerMovements()
+        for movement in allmovements:
+            index = calculate_index(movement)
+            boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins))            
+
+def showWinner(who):
+    franja=tk.Frame(root, bg="lightgray", height=207)
+    franja.config(width=415)
+    franja.place(relx=0.5, rely=0.44, anchor="center")
+    franja.pack_propagate(False)
+
+    fuente_grande = ("Helvetica", 20)
+
+    winnerLabel = tk.Label(franja, text=f'Ganador: {who}', font=fuente_grande, bg="lightgray")
+    winnerLabel.pack(pady=10, anchor="center")
 
 
 def selectDifficulty():
     franja=tk.Frame(root, bg="lightgray", height=207)
     franja.config(width=415)
     franja.place(relx=0.5, rely=0.44, anchor="center")
-    easyButton= tk.Button(franja, text="Easy", command=lambda: changeDifficulty(franja,2),width=25,height=10)
-    easyButton.pack(side="left", padx=10)
     franja.pack_propagate(False)
-    #Falta Intermedio
-    hardButton= tk.Button(franja, text="Hard", command=lambda: changeDifficulty(franja,6),width=25,height=10)
-    hardButton.pack(side="right", padx=10)
+    fuente_grande = ("Helvetica", 20)
+    easyButton= tk.Button(franja, text="Easy",font=fuente_grande, command=lambda: changeDifficulty(franja,2))
+    easyButton.pack(side="left",  padx=20)
+    mediumButton= tk.Button(franja, text="Medium",font=fuente_grande, command=lambda: changeDifficulty(franja,4))
+    mediumButton.pack( side="left",padx=20)
+    hardButton= tk.Button(franja, text="Hard",font=fuente_grande, command=lambda: changeDifficulty(franja,6))
+    hardButton.pack( side="left",padx=20)
 
 #Set grid interface
 def board_interface(board, frame):
