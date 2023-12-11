@@ -13,11 +13,11 @@ class Node:
     def calcularHeuristica(self):
         ai_special = self.gameState.ai.getSpecialCoins()
         ai_normal = self.gameState.ai.getNormalCoins()
-        # player_special = self.gameState.player.getSpecialCoins()
-        # player_normal = self.gameState.player.getNormalCoins()
+        player_special = self.gameState.player.getSpecialCoins()
+        player_normal = self.gameState.player.getNormalCoins()
         total_coins = self.gameState.coinPointsLeft
         # print(f"Monedas especiales: {ai_special} normales {ai_normal}")
-        heuristic_value = (ai_special * 3 + ai_normal) - total_coins
+        heuristic_value = (ai_special * 3 + ai_normal) - (player_special * 3 + player_normal)
         self.setHeuristica(heuristic_value)
         return heuristic_value
     
