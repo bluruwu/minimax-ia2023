@@ -8,8 +8,10 @@ import copy
 from response import generateResponse
 from tkinter import simpledialog
 from tkinter import messagebox
-difficulty = None
+
+depth = None
 selected_difficulty = None
+
 def read_game():
     free_space = [
     (0, 2), (0, 3), (0, 4), (0, 5),
@@ -108,9 +110,7 @@ def movePlayer(newPosition, board, boxes, user_coins):
     update(board, boxes, user_coins, cpu_coins)
     
 
-def update(board, boxes, user_coins, cpu_coins):   
-    _ , positionAI = generateResponse(copy.deepcopy(board),difficulty)
-    moveAI(board, boxes, positionAI, cpu_coins)
+def update(board, boxes, user_coins, cpu_coins):
     if(board.whoWon!='NotYet'):
         for box in boxes:
             box.unbind("<Button-1>")
@@ -118,68 +118,54 @@ def update(board, boxes, user_coins, cpu_coins):
     else:    
         #MOVE AI
         #Generate best move
+        _ , positionAI = generateResponse(copy.deepcopy(board),depth)
+        moveAI(board, boxes, positionAI, cpu_coins)
         for box in boxes:
             box.unbind("<Button-1>") 
         #all possible movements
         allmovements = board.showPlayerMovements()
         for movement in allmovements:
             index = calculate_index(movement)
-            boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins))            
+            boxes[index].bind("<Button-1>", lambda event, newPosition = movement: movePlayer(newPosition, board, boxes, user_coins))    
+
 
 def showWinner(who):
     franja=tk.Frame(root, bg="lightgray", height=207)
     franja.config(width=415)
     franja.place(relx=0.5, rely=0.44, anchor="center")
     franja.pack_propagate(False)
-
     fuente_grande = ("Helvetica", 20)
-
     winnerLabel = tk.Label(franja, text=f'Ganador: {who}', font=fuente_grande, bg="lightgray")
     winnerLabel.pack(pady=10, anchor="center")
 
 
 def selectDifficulty():
-    global difficulty, selected_difficulty
+    global depth, selected_difficulty
     difficulty_str = simpledialog.askstring("Dificultad", "Selecciona la dificultad (1: Fácil, 2: Normal, 3: Difícil):")
-    
     if difficulty_str is not None:
         try:
-            difficulty = int(difficulty_str)
-            if 1 <= difficulty <= 3:
-                franja = tk.Frame(root, bg="lightgray", height=207)
-                franja.config(width=415)
-                franja.place(relx=0.5, rely=0.44, anchor="center")
-                
-                if difficulty == 1:
-                    button_text = "Easy"
-                    difficulty_value = 2
-                if difficulty == 2:
-                    button_text = "Normal"
-                    difficulty_value = 4
-                elif difficulty == 3:
-                    button_text = "Hard"
-                    difficulty_value = 6
-
-
-                
-                    
-                changeDifficulty(franja, difficulty_value)
-                
-                
-                global selected_difficulty
-                selected_difficulty = difficulty
-                franja.destroy()
-                print(difficulty)
+            selectDifficulty = int(difficulty_str)
+            if 1 <= selectDifficulty <= 3:
+                if selectDifficulty == 1:
+                    depth_value = 2
+                if selectDifficulty == 2:
+                    depth_value = 4
+                elif selectDifficulty == 3:
+                    depth_value = 6
+                changeDifficulty(depth_value)
             else:
                 # Handle other difficulty values as needed
-                    button_text = "Unknown"
-                    difficulty_value = 2
-                    print("ERRORRRRR")
+                    changeDifficulty(2)
+                    print("Error")
                     messagebox.showwarning("Advertencia", "Valor de dificultad no reconocido. Se ha establecido como Facil.")
- 
         except ValueError:
             # Handle the case where the input is not a valid integer
             print("Por favor, ingresa un número válido.")
+
+def changeDifficulty(number):
+    global depth
+    depth = number
+    
 #Set grid interface
 def board_interface(board, frame):
     box_labels = []
@@ -210,11 +196,6 @@ def points(frame, board):
     cpu_coins.set(f"Cpu: {board.ai.getCoins()}")
     cpu.grid(sticky="e", column=1, row=0, padx=(80,0))
     return user_coins, cpu_coins
-
-def changeDifficulty(franja,number):
-    global difficulty
-    difficulty = number
-    franja.destroy()
 
 if __name__ == "__main__":
     #InitGame

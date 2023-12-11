@@ -15,7 +15,15 @@ class Node:
         ai_normal = self.gameState.ai.getNormalCoins()
         player_special = self.gameState.player.getSpecialCoins()
         player_normal = self.gameState.player.getNormalCoins()
-        heuristic_value = (ai_special * 3 + ai_normal) - (player_special * 3 + player_normal)
+        iapoints = self.gameState.ai.getCoins()
+        playerpoints = self.gameState.player.getCoins()
+        coinsleft = self.gameState.coinPointsLeft
+
+        # heuristic_value = (1/self.depth + 1)+iapoints+(1/coinsleft +1)
+        # print("Soy profundidad", self.depth)
+        heuristic_value = (ai_special * 3 + ai_normal) - (player_special * 3 + player_normal) + (iapoints - playerpoints) - (1 * self.depth)
+        # print(f"Heuristica {heuristic_value}")
+
         self.setHeuristica(heuristic_value)
         return heuristic_value
     

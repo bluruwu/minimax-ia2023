@@ -2,7 +2,6 @@ from node import Node
 
 def generateResponse(game,difficulty):
     result=minimax(Node(game,None),difficulty,-10000000,10000000,True)
-    print(result)
     return result
 
 
@@ -14,9 +13,13 @@ def minimax(node:Node, depth,alpha,beta,maximizing):
     if maximizing:
         maxEval=float('-inf')
         best_move = None
+        # print("**************************nuevos movs")
         posibleMovements=node.gameState._showAIMovements()
         for n in posibleMovements:
             eval, _=minimax(node.expandir(n),depth-1,alpha,beta,False)
+            # print("--------------------")
+            # print("eval", eval)
+            # print("max eval", maxEval)
             if eval > maxEval:
                 maxEval = eval
                 best_move = n

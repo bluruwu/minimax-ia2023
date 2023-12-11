@@ -92,16 +92,7 @@ class GameState:
     
     def getAIPosition(self):
         return self.ai.getPosition()
-    
-    def getPlayer(self):
-        return copy.copy(self.player)
-    
-    def getAI(self):
-        return copy.copy(self.ai)
-    
-    def getMap(self):
-        return copy.copy(self.matriz)
-    
+
     def willigetcoin(self, newPosition, user):
         if((self.matriz[newPosition[0]][newPosition[1]]==1) or (self.matriz[newPosition[0]][newPosition[1]]==3)):
             user.tookcoin= True
