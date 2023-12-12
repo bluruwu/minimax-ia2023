@@ -27,7 +27,6 @@ class Node:
         heuristic_value = sigmoid((ai_special * 3 + ai_normal) - (player_special * 3 + player_normal) + (iapoints - playerpoints) - (0.4 * self.depth))
         normalized_heuristic = normalize(heuristic_value, 0, 1)
         self.setHeuristica(normalized_heuristic)
-        print(normalized_heuristic)
         return normalized_heuristic
     
     def setHeuristica(self,number):
