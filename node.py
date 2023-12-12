@@ -20,7 +20,7 @@ class Node:
     def calcularHeuristica(self):
         iapoints = self.gameState.ai.getCoins()
         playerpoints = self.gameState.player.getCoins()
-        heuristic_value = sigmoid((iapoints - playerpoints) - (0.4/ self.depth+1))
+        heuristic_value = sigmoid((iapoints - playerpoints) + (0.5/ self.depth+1))
         normalized_heuristic = normalize(heuristic_value, 0, 1)
         self.setHeuristica(normalized_heuristic)
         return normalized_heuristic
