@@ -109,7 +109,6 @@ def movePlayer(newPosition, board, boxes, user_coins):
     #Next move
     update(board, boxes, user_coins, cpu_coins)
     
-
 def update(board, boxes, user_coins, cpu_coins):
     if(board.whoWon!='NotYet'):
         for box in boxes:
@@ -120,6 +119,10 @@ def update(board, boxes, user_coins, cpu_coins):
         #Generate best move
         _ , positionAI = generateResponse(copy.deepcopy(board),depth)
         moveAI(board, boxes, positionAI, cpu_coins)
+        if(board.whoWon!='NotYet'):
+            for box in boxes:
+                box.unbind("<Button-1>")
+            showWinner(f'{board.whoWon}') 
         for box in boxes:
             box.unbind("<Button-1>") 
         #all possible movements
@@ -200,7 +203,8 @@ def points(frame, board):
 if __name__ == "__main__":
     #InitGame
     board = read_game()
-    
+    #Select difficulty
+    selectDifficulty()
     #Root interface
     root = tk.Tk()
     root.title ("Yoshi's battle")
@@ -210,8 +214,6 @@ if __name__ == "__main__":
     frame_board = tk.Frame(root)
     frame_board.pack()
     root.columnconfigure(0, weight=1)
-    #Select difficulty
-    selectDifficulty()
     #Points
     frame_points = tk.Frame(root)
     frame_points.pack(side="bottom", fill="both")
